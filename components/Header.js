@@ -1,4 +1,20 @@
+import { useState } from 'react';
+import axios from 'axios';
+
 export default function Header() {
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [email, setEmail] = useState("")
+    const [state, setState] = useState("IDLE")
+
+const subscribe = async () => {
+    setState("LOADING")
+    setErrorMessage(null)
+    try {
+        const response = await axios.post("api/subscribe", { email })
+        setState("SUCCESS")
+    } catch (e) {
+    setErrorMessage(e.response.data.error)
+    setState("ERROR")}}
 
     return (
         <div className="overflow-hidden bg-gray-900">
@@ -83,15 +99,21 @@ export default function Header() {
                             <input
                             placeholder="john.doe@example.org"
                             required
-                            type="text"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:border-deep-purple-accent-400 focus:outline-none focus:shadow-outline"
                             id="email"
                             name="email"
                             />
+                            {state === "ERROR" && <p className="text-red-700">{errorMessage}</p>}
+                            {state === "SUCCESS" && <p className="text-green-600">You have successfully registered on mailing list! 🎉</p>}
                         </div>
                         <div className="mt-4 mb-2 sm:mb-4">
                             <button
-                            type="submit"
+                            type="button"
+                            disabled={state === "LOADING"}
+                            onClick={subscribe}
                             className="inline-flex items-center justify-center w-full h-12 px-6 font-medium tracking-wide text-white transition duration-200 rounded shadow-md bg-deep-purple-accent-400 hover:bg-deep-purple-accent-700 focus:shadow-outline focus:outline-none"
                             >
                             Subscribe
